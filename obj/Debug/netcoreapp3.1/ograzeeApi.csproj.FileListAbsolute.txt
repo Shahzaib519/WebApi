@@ -31,3 +31,4 @@ C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograze
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.dll
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.pdb
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.genruntimeconfig.cache
+C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.csprojAssemblyReference.cache

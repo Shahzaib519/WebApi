@@ -8,15 +8,15 @@ namespace ograzeeApi.Models
 {
     public class registration
     {
-        
-        public string Id { get; set; }
+        [BsonId]
+        public object _id { get; set; }
 
 
         [BsonElement] 
         public string Email { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
-        public string MobileNo { get; set; }
+        public string Mobile { get; set; }
 
     }
 }

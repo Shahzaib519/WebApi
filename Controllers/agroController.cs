@@ -13,7 +13,7 @@ namespace ograzeeApi.Controllers
     [ApiController]
     public class agroController : ControllerBase
     {
-        agroApiServices api = new agroApiServices();
+       
 
         // GET: api/<agroController>
         [HttpGet]

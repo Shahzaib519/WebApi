@@ -21,8 +21,11 @@ namespace ograzeeApi.Repository
         {
             try
             {
-                client = new MongoClient(mongoConnection);
-                database = client.GetDatabase(mongoDb);
+                if (client == null)
+                {
+                    client = new MongoClient(mongoConnection);
+                    database = client.GetDatabase(mongoDb);
+                }
                 return true;
             }
             catch (Exception)
@@ -31,7 +34,7 @@ namespace ograzeeApi.Repository
             }
         }
 
-        public static IMongoCollection<registration> clients_collection(string collection) //email
+        public static IMongoCollection<registration> clients_collection()
         {
             return database.GetCollection<registration>("Clients");
         }

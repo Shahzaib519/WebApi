@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using ograzeeApi.Models;
 using System;
 using System.Collections.Generic;
@@ -17,16 +18,25 @@ namespace ograzeeApi.Repository
         /////////////////////////////////////////////////
 
         // sign-in
-        public bool SignIn(string email, string password) {
+        public int SignIn(string email, string password) {
             /////
             if(Repository.MongoHelper.ConnectToMongoService("SUsers"))
             {
-                
-                return true;
+                var builder = Builders<registration>.Filter;
+                var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", password));
+                var result = Repository.MongoHelper.clients_collection().Find(filter).ToList();
+                if(result.Count==1) // Successfully login
+                {
+                    return 1;
+                }
+                else
+                {
+                    return result.Count;
+                }
             }
             else
             {
-                return false;
+                return -1;
             }
 
         }
@@ -37,9 +47,47 @@ namespace ograzeeApi.Repository
             //////
         }
 
+        private static Random random= new Random();
+        private object GenerateRandomID(int v)
+        {
+            string strArray = "abcdefghijklmnopqrstuvwxyz123456789";
+            return new string(Enumerable.
+                Repeat(strArray, v)
+                .Select(s => s[random.Next(s.Length)]).ToArray()
+                );
+        }
+
         // sign-up
-        void SignUp(string email, string password, string userName, string mobileNo) {
-            //////
+        // create new user in USers
+        public int SignUp(string email, string password, string userName, string mobileNo) {
+            if (Repository.MongoHelper.ConnectToMongoService("SUsers"))
+            {
+                var filter = Builders<registration>.Filter.Eq("Email", email);
+                var result = Repository.MongoHelper.clients_collection().Find(filter).ToList();
+                if (result.Count ==1)
+                {
+                    return 1;
+                }
+                else
+                {
+                    Object id = GenerateRandomID(24);
+                    Repository.MongoHelper.clients_collection().InsertOneAsync(
+                            new registration
+                            {
+                                _id = id,
+                                Email = email,
+                                Password = password,
+                                Name = userName,
+                                Mobile = mobileNo
+                            }
+                        );
+                    return 0;
+                }
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         // sendPasswordResetEmail
