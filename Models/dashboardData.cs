@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace ograzeeApi.Models
 {
-    public class dashboardData
+    public class DashboardData
     {
         public string Name { get; set; }
-        public string Balance { get; set; }
-        public string SaleAmount { get; set; }
-        public string WithdrawalableAmount { get; set; }
+        public string Sale { get; set; }
+        public string Withdrawalable { get; set; }
     }
 }

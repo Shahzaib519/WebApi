@@ -20,11 +20,11 @@ namespace ograzeeApi.Repository
         // sign-in
         public int SignIn(string email, string password) {
             /////
-            if(Repository.MongoHelper.ConnectToMongoService("SUsers"))
+            if(Repository.MongoHelper.ConnectToMongoService())
             {
                 var builder = Builders<registration>.Filter;
                 var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", password));
-                var result = Repository.MongoHelper.clients_collection().Find(filter).ToList();
+                var result = MongoHelper.clients_collection().Find(filter).ToList();
                 if(result.Count==1) // Successfully login
                 {
                     return 1;
@@ -42,10 +42,10 @@ namespace ograzeeApi.Repository
         }
 
 
-        // sign-out
-        void SignOut() {
-            //////
-        }
+        //// sign-out
+        //void SignOut() {
+        //    //////
+        //}
 
         private static Random random= new Random();
         private object GenerateRandomID(int v)
@@ -60,7 +60,7 @@ namespace ograzeeApi.Repository
         // sign-up
         // create new user in USers
         public int SignUp(string email, string password, string userName, string mobileNo) {
-            if (Repository.MongoHelper.ConnectToMongoService("SUsers"))
+            if (Repository.MongoHelper.ConnectToMongoService() && Repository.MongoHelper.ConnectToDataMongoService())
             {
                 var filter = Builders<registration>.Filter.Eq("Email", email);
                 var result = Repository.MongoHelper.clients_collection().Find(filter).ToList();
@@ -79,6 +79,21 @@ namespace ograzeeApi.Repository
                                 Password = password,
                                 Name = userName,
                                 Mobile = mobileNo
+                            }
+                        );
+                    Repository.MongoHelper.GetProfileCollection(email).InsertOneAsync(
+                            new UserDataField
+                            {
+                                Id=id,
+                                Name = userName,
+                                Email = email,
+                                Mobile = mobileNo,
+                                Address = "",
+                                ProfileImage = "",
+                                Sales = new List<SaleData>(),
+                                Sale = 0,
+                                Withdrawalable = 0,
+                                SalesCount = 0
                             }
                         );
                     return 0;
@@ -104,8 +119,25 @@ namespace ograzeeApi.Repository
         // getDashboardData
         // Name  ==> from Profile
         // CurrentBalance, Sale(Demand)Amount, WithdrawalableAmount ==> from Account of the required User
-        void GetDashboardData(string email) {
-            /////////
+        public UserDataField GetDashboardData(string email) {
+            if (Repository.MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
+                List<UserDataField> result = MongoHelper.GetProfileCollection(email).Find(filter).ToList();
+                if(result.Count==1)
+                { 
+                    return result[0];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /////////////////////////////////////////////////
@@ -114,16 +146,51 @@ namespace ograzeeApi.Repository
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
 
-        // getProfile
-        void GetProfile(string email) {
-            //////
+        public dynamic UpdateAddressMobile(string email, string address, string mobile)
+        {
+            if (MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                var update = Builders<UserDataField>.Update.Set("Address", address).Set("Mobile", mobile).CurrentDate("lastModified");
+                var result = MongoHelper.GetProfileCollection(email).UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        // updateProfile
-        void UpdateProfile(string email /*ProfileDataModel updatedProfile*/) {
-            ///////
+        public dynamic UpdatePassword(string email, string oldp, string newp)
+        {
+            if (MongoHelper.ConnectToMongoService())
+            {
+                var builder = Builders<registration>.Filter;
+                var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", oldp));
+                var update = Builders<registration>.Update.Set("Password", newp).CurrentDate("lastModified");
+                var result = MongoHelper.clients_collection().UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
+        public dynamic UpdateImage(string email, string image)
+        {
+            if (MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                var update = Builders<UserDataField>.Update.Set("ProfileImage", image).CurrentDate("lastModified");
+                var result = MongoHelper.GetProfileCollection(email).UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
@@ -131,25 +198,53 @@ namespace ograzeeApi.Repository
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
 
-        // getAccount
-        //     CurrentBalance, Sale(Demand)Amount, WithdrawalableAmount
-        void GetAccount(string email) {
-            ////
+
+        public dynamic updateSalesCount(string email, int count)
+        {
+            if (MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                var update = Builders<UserDataField>.Update.Set("SalesCount", count).CurrentDate("lastModified");
+                var result = MongoHelper.GetProfileCollection(email).UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        // updateCurrentBalance
-        void UpdateCurrentBalance(string email, string addBalance, bool addSub) {
-            /////
+
+        public dynamic updateSaleAmount(string email, double saleAmount)
+        {
+            if (MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                var update = Builders<UserDataField>.Update.Set("Sale", saleAmount).CurrentDate("lastModified");
+                var result = MongoHelper.GetProfileCollection(email).UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        // updateSaleAmount
-        void UpdateSaleAmount(string email, string addSaleAmount, bool addSub) {
-            /////
-        }
-
+        
         // updateWithdrawalableAmount
-        void UpdateWithdrawalableAmount(string email, string withdarwAmount, bool addSub) {
-            /////
+        public dynamic UpdateWithdrawalableAmount(string email, double withdarwAmount)
+        {
+            if (MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                var update = Builders<UserDataField>.Update.Set("Withdrawalable", withdarwAmount).CurrentDate("lastModified");
+                var result = MongoHelper.GetProfileCollection(email).UpdateOne(filter, update);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /////////////////////////////////////////////////
@@ -159,9 +254,26 @@ namespace ograzeeApi.Repository
         /////////////////////////////////////////////////
 
         // addNewSale
-        void AddNewSale(string email /*SaleDataModel sale*/)
+        public dynamic AddNewSale(string email, string image, string cat, string quant, string uom, string address, string demand)
         {
-            //////
+            if (Repository.MongoHelper.ConnectToDataMongoService())
+            {
+                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
+                List<UserDataField> result = MongoHelper.GetProfileCollection(email).Find(filter).ToList();
+                if (result.Count == 1)
+                {
+                    return result[0];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // updateSale

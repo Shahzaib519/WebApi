@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using ograzeeApi.Models;
 using ograzeeApi.Repository;
 using System;
 using System.Collections.Generic;
@@ -23,11 +25,11 @@ namespace ograzeeApi.Controllers
             
             if(res==1)     // successful
             {
-                return "Sigin, True, 1";
+                return "Sigin successfully, 1";
             }
             else if (res == -1)     // nope
             {
-                return "Sigin, False,-1";
+                return "Network Connection, -1";
             }
             else
             {
@@ -48,21 +50,137 @@ namespace ograzeeApi.Controllers
 
             if (res == 1)     // successful
             {
-                return "True, 1";
+                return "Already Exists, 1";
             }
             else if (res == -1)     // nope
             {
-                return "False,-1";
+                return "Network Connection,-1";
             }
             else if (res == 0)     // nope
             {
-                return "True, 0";
+                return "Done with Signup, 0";
             }
             else
             {
                 return "wrong Credentials," + res;
             }
             //return "value2" + password;
+        }
+
+
+
+        [HttpGet]
+        [Route("dashboard")]
+        public dynamic GetDashboardData(string email)
+        {
+            UserDataField res = api.GetDashboardData(email);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("updateam")]
+        public dynamic UpdateAddressMobile(string email, string address, string mobile)
+        {
+            dynamic res = api.UpdateAddressMobile(email, address, mobile);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        [HttpGet]
+        [Route("updateps")]
+        public dynamic UpdatePs(string email, string oldpassword, string newpassword)
+        {
+            dynamic res = api.UpdatePassword(email, oldpassword, newpassword);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        [HttpGet]
+        [Route("updateimage")]
+        public dynamic UpdateImage(string email, string image)
+        {
+            dynamic res = api.UpdateImage(email, image);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        [HttpGet]
+        [Route("updatesaleamt")]
+        public dynamic UpdateSaleAmount(string email, double amount)
+        {
+            dynamic res = api.updateSaleAmount(email, amount);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        [HttpGet]
+        [Route("updatewithdraw")]
+        public dynamic UpdateWithdrawalAmount(string email, double amount)
+        {
+            dynamic res = api.UpdateWithdrawalableAmount(email, amount);
+
+            if (res == null)    // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        [HttpGet]
+        [Route("updatesalecount")]
+        public dynamic UpdateSaleCount(string email, int count)
+        {
+            dynamic res = api.updateSalesCount(email, count);
+
+            if (res == null)    // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
         }
 
 
