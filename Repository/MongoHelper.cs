@@ -9,11 +9,16 @@ namespace ograzeeApi.Repository
 {
     public class MongoHelper
     {
+        // different clients
         public static IMongoClient Userclient { get; set; }
         public static IMongoClient Dataclient { get; set; }
+        public static IMongoClient Saleclient { get; set; }
 
+        // different database
         public static IMongoDatabase Userdatabase { get; set; }
         public static IMongoDatabase Datadatabase { get; set; }
+        public static IMongoDatabase Saledatabase { get; set; }
+
 
         public static string mongoConnection = "mongodb+srv://agro123:agro123@cluster0.iwszy.mongodb.net/";
 
@@ -54,6 +59,23 @@ namespace ograzeeApi.Repository
             }
         }
 
+        internal static bool ConnectToSaleMongoService(string mongoDb = "Sale") // SUsers, SData  
+        {
+            try
+            {
+                if (Saleclient == null)
+                {
+                    Saleclient = new MongoClient(mongoConnection);
+                    Saledatabase = Saleclient.GetDatabase(mongoDb);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public static IMongoCollection<registration> clients_collection()
         {
             return Userdatabase.GetCollection<registration>("Clients");
@@ -62,6 +84,11 @@ namespace ograzeeApi.Repository
         public static IMongoCollection<UserDataField> GetProfileCollection(string collection) //email
         {
             return Datadatabase.GetCollection<UserDataField>(collection);
+        }
+
+        public static IMongoCollection<SaleData> GetSaleCollection(string collection) //email
+        {
+            return Saledatabase.GetCollection<SaleData>(collection);
         }
 
     }

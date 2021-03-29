@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace ograzeeApi.Repository
 {
@@ -85,9 +87,11 @@ namespace ograzeeApi.Repository
                             new UserDataField
                             {
                                 Id=id,
+                                CustomerID = "AGRO" + mobileNo,
                                 Name = userName,
                                 Email = email,
                                 Mobile = mobileNo,
+                                EmailVerified = "no",
                                 Address = "",
                                 ProfileImage = "",
                                 Sales = new List<SaleData>(),
@@ -106,8 +110,31 @@ namespace ograzeeApi.Repository
         }
 
         // sendPasswordResetEmail
-        void SendPasswordResetEmail(string email) {
-            ///////
+        public int SendPasswordResetEmail(string email, string code="7e7x")
+        {
+            try {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("AgroZee", "agrozeegglobal@gmail.com"));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject = "Password Reset";
+                message.Body = new TextPart("plain")
+                {
+                    Text = "Proceed with this " + code + " through app"
+                };
+                using (var client = new SmtpClient())
+                {
+                    client.Connect("smtp.gmail.com", 587, false);
+                    client.Authenticate("agrozeegglobal@gmail.com", "Global7869");
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+                return 0;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            
         }
 
         /////////////////////////////////////////////////
@@ -123,6 +150,7 @@ namespace ograzeeApi.Repository
             if (Repository.MongoHelper.ConnectToDataMongoService())
             {
                 var filter = Builders<UserDataField>.Filter.Eq("Email", email);
+                //var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", password));
                 //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
                 List<UserDataField> result = MongoHelper.GetProfileCollection(email).Find(filter).ToList();
                 if(result.Count==1)
@@ -139,6 +167,33 @@ namespace ograzeeApi.Repository
                 return null;
             }
         }
+
+
+        //ValidReceiver(emailto, customerIDto)=="no"
+        public UserDataField ValidReceiver(string email, string customerID)
+        {
+            if (Repository.MongoHelper.ConnectToDataMongoService())
+            {
+                var builder = Builders<UserDataField>.Filter;
+                var filter = builder.And(builder.Eq("Email", email), builder.Eq("CustomerID", customerID));
+                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
+                List<UserDataField> result = MongoHelper.GetProfileCollection(email).Find(filter).ToList();
+                if (result.Count == 1)
+                {
+                    return result[0];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
 
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
@@ -254,21 +309,54 @@ namespace ograzeeApi.Repository
         /////////////////////////////////////////////////
 
         // addNewSale
-        public dynamic AddNewSale(string email, string image, string cat, string quant, string uom, string address, string demand)
+        public dynamic AddNewSale(string email, string image, string cat, double quant, string address, double demand, string date)
         {
-            if (Repository.MongoHelper.ConnectToDataMongoService())
+            if (Repository.MongoHelper.ConnectToSaleMongoService())
             {
-                var filter = Builders<UserDataField>.Filter.Eq("Email", email);
-                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
-                List<UserDataField> result = MongoHelper.GetProfileCollection(email).Find(filter).ToList();
-                if (result.Count == 1)
+                try
                 {
-                    return result[0];
+                    Object id = GenerateRandomID(24);
+                    Repository.MongoHelper.GetSaleCollection(email).InsertOneAsync(
+                            new SaleData
+                            {
+                                _id = id,
+                                Category = cat,
+                                Quantity = quant,
+                                Address = address,
+                                Demand = demand,
+                                SaleImageURL = image,
+                                PublishDate = date
+                            }
+                        );
+                    return 0;
                 }
-                else
+                catch(Exception e)
                 {
                     return null;
                 }
+            }
+            else
+            {
+                return -1;
+
+            }
+        }
+        // updateSale
+        public dynamic UpdateSaleRequest(string email, string id, string image, string cat, double quant, string address, double demand, string date) {
+            if (MongoHelper.ConnectToSaleMongoService())
+            {
+               var filter = Builders<SaleData>.Filter.Eq("_id", id);
+                var update = Builders<SaleData>.Update
+                    .Set("Category", cat)
+                    .Set("Quantity", quant)
+                    .Set("Address", address)
+                    .Set("Demand", demand)
+                    .Set("SaleImageURL", image)
+                    .Set("PublishDate", date)
+
+                    .CurrentDate("lastModified");
+                var result = MongoHelper.GetSaleCollection(email).UpdateOne(filter, update);
+                return result;
             }
             else
             {
@@ -276,14 +364,19 @@ namespace ograzeeApi.Repository
             }
         }
 
-        // updateSale
-        void UpdateSale(string email/*SaleDataModel sale*/) { 
-            //////////
-        }
+        // DeleteSale
+        public dynamic DeleteSale(string email, string id){
+            if (MongoHelper.ConnectToSaleMongoService())
+            {
+                var filter = Builders<SaleData>.Filter.Eq("_id", id);
+                var result = MongoHelper.GetSaleCollection(email).DeleteOne(filter);
 
-        // updateSale
-        void DeleteSale(string email/*SaleDataModel sale pickid*/){
-            ////////
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /////////////////////////////////////////////////

@@ -12,8 +12,10 @@ namespace ograzeeApi.Models
         public object Id { get; set; }
 
         [BsonElement]
+        public string CustomerID { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
+        public string EmailVerified { get; set; }
         public string Mobile { get; set; }
         public string Address { get; set; }
         public string ProfileImage { get; set; }

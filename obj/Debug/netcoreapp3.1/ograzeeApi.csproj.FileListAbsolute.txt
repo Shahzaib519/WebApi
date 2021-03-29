@@ -32,3 +32,6 @@ C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograze
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.pdb
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.genruntimeconfig.cache
 C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\obj\Debug\netcoreapp3.1\ograzeeApi.csprojAssemblyReference.cache
+C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\bin\Debug\netcoreapp3.1\MailKit.dll
+C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\bin\Debug\netcoreapp3.1\MimeKit.dll
+C:\Users\Shahzaib Rasheed\source\repos\ograzeeApi\bin\Debug\netcoreapp3.1\BouncyCastle.Crypto.dll
