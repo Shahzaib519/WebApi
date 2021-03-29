@@ -9,7 +9,7 @@ namespace ograzeeApi.Models
     public class registration
     {
         [BsonId]
-        public object _id { get; set; }
+        public string _id { get; set; }
 
 
         [BsonElement] 

@@ -9,7 +9,7 @@ namespace ograzeeApi.Models
     public class TransactionHistory
     {
         [BsonElement]
-        public object Id { get; set; }
+        public string Id { get; set; }
 
         [BsonElement]
         public string Date { get; set; }

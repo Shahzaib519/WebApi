@@ -9,7 +9,7 @@ namespace ograzeeApi.Models
     public class UserDataField
     {
         [BsonElement]
-        public object Id { get; set; }
+        public string Id { get; set; }
 
         [BsonElement]
         public string CustomerID { get; set; }
@@ -24,7 +24,6 @@ namespace ograzeeApi.Models
         public double Sale { get; set; }
         public double Withdrawalable { get; set; }
         public dynamic lastModified { get; set; }
-        public List<SaleData> Sales { get; set; }
-    
+       
     }
 }

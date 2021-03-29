@@ -40,31 +40,66 @@ namespace ograzeeApi.Controllers
 
 
 
+        private static Random random = new Random();
+        private string GenerateRandomID(int v)
+        {
+            string strArray = "abcdefghijklmnopqrstuvwxyz123456789";
+            return new string(Enumerable.
+                Repeat(strArray, v)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
 
         // GET: api/<agroController>
         [HttpGet]
         [Route("signup")]
         public string SignUp(string email, string password, string name, string mobile)
         {
-            int res = api.SignUp(email, password, name, mobile);
+            long res = api.SignUp(email, password, name, mobile);
 
-            if (res == 1)     // successful
+            if (res == -2)     // successful
             {
-                return "Already Exists, 1";
+                return "Already Exists, -2";
+            }
+            else if (res == -3)     // nope
+            {
+                return "Network Connection while connecting to server, -3";
             }
             else if (res == -1)     // nope
             {
-                return "Network Connection,-1";
+                return "Problem while modifying Sys Data";
             }
-            else if (res == 0)     // nope
+            else if(res < 0)
             {
-                return "Done with Signup, 0";
+                return "Something wrong, " + res;
             }
             else
             {
-                return "wrong Credentials," + res;
+                string code = GenerateRandomID(4);
+                api.SendPasswordResetEmail(email, code);
+                return "Done with Signup, with "+ code;
             }
             //return "value2" + password;
+        }
+
+
+
+        [HttpGet]
+        [Route("verifyemail")]
+        public dynamic SendPasswordResetEmail(string email)
+        {
+            string code = GenerateRandomID(4);
+            int res = api.SendPasswordResetEmail(email, code);
+            
+            if (res == -1)     // unsuccessful
+            {
+                return "Network Connection or some problem. -1";
+            }
+            else
+            {
+                return res;
+            }
         }
 
 
@@ -85,6 +120,27 @@ namespace ograzeeApi.Controllers
             }
         }
 
+
+
+        //[HttpGet]
+        //[Route("verifyuser")]
+        //public dynamic ValidReceiver(string email, string customerID)
+        //{
+        //    UserDataField res = api.ValidReceiver(email, customerID);
+
+        //    if (res == null)     // unsuccessful
+        //    {
+        //        return "Network Connection,-1";
+        //    }
+        //    else
+        //    {
+        //        return res;
+        //    }
+        //}
+
+        //////////////////////////////////////
+        ////////////// Updates ///////////////
+        //////////////////////////////////////
 
 
         [HttpGet]
@@ -136,6 +192,11 @@ namespace ograzeeApi.Controllers
         }
 
 
+
+        //////////////////////////////////////
+        ///////////// canWithdraw ////////////
+        //////////////////////////////////////
+
         [HttpGet]
         [Route("canwithdraw")]
         public dynamic CanWidthdraw(string email, double amount)
@@ -153,6 +214,11 @@ namespace ograzeeApi.Controllers
         }
 
 
+
+        //////////////////////////////////////
+        /////////////// Transfer /////////////
+        //////////////////////////////////////
+        
         [HttpGet]
         [Route("transferamount")]
         public dynamic TransferAmount(string emailfrom, string emailto, string customerIDto, double amount)
@@ -200,28 +266,31 @@ namespace ograzeeApi.Controllers
 
 
 
-
         [HttpGet]
         [Route("newsale")]
         public dynamic NewSaleRequest(string email, string image, string cat, double quantity, double demandamount, string address, string date)
         {
             dynamic res = api.AddNewSale(email, image, cat, quantity, address, demandamount, date);
 
-            if (res == null)     // successful
+            if (res == -2)     // successful
             {
-                return "Already Exists, 1";
+                return "Error while adding new Sale Request.";
+            }
+            else if (res == -3)     // nope
+            {
+                return "Network Connection while connecting to server, -3";
             }
             else if (res == -1)     // nope
             {
-                return "Network Connection,-1";
+                return "Problem while modifying Sys Data";
             }
-            else if (res == 0)     // nope
+            else if (res < 0)
             {
-                return "Successfully New Request Added!";
+                return "Something wrong, " + res;
             }
             else
             {
-                return res;
+                return "Done with New Sale Request Sucessfully, 0="+res;
             }
         }
 
@@ -242,6 +311,8 @@ namespace ograzeeApi.Controllers
                 return res;
             }
         }
+
+
 
         [HttpGet]
         [Route("deletesale")]

@@ -13,17 +13,16 @@ namespace ograzeeApi.Repository
         public static IMongoClient Userclient { get; set; }
         public static IMongoClient Dataclient { get; set; }
         public static IMongoClient Saleclient { get; set; }
+        public static IMongoClient Sysclient { get; set; }
 
         // different database
         public static IMongoDatabase Userdatabase { get; set; }
         public static IMongoDatabase Datadatabase { get; set; }
         public static IMongoDatabase Saledatabase { get; set; }
+        public static IMongoDatabase Sysdatabase { get; set; }
 
 
         public static string mongoConnection = "mongodb+srv://agro123:agro123@cluster0.iwszy.mongodb.net/";
-
-        public static IMongoCollection<registration> clients;
-        public static IMongoCollection<UserDataField> profile;
 
         internal static bool ConnectToMongoService(string mongoDb="SUsers") // SUsers, SData  
         {
@@ -76,6 +75,23 @@ namespace ograzeeApi.Repository
             }
         }
 
+        internal static bool ConnectToSysMongoService(string mongoDb = "HardcodeSystemData") // SUsers, SData  
+        {
+            try
+            {
+                if (Sysclient == null)
+                {
+                    Sysclient = new MongoClient(mongoConnection);
+                    Sysdatabase = Sysclient.GetDatabase(mongoDb);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public static IMongoCollection<registration> clients_collection()
         {
             return Userdatabase.GetCollection<registration>("Clients");
@@ -89,6 +105,11 @@ namespace ograzeeApi.Repository
         public static IMongoCollection<SaleData> GetSaleCollection(string collection) //email
         {
             return Saledatabase.GetCollection<SaleData>(collection);
+        }
+
+        public static IMongoCollection<SysData> GetSysCollection() //email
+        {
+            return Sysdatabase.GetCollection<SysData>("Data");
         }
 
     }

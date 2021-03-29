@@ -9,7 +9,7 @@ namespace ograzeeApi.Models
     public class SaleData
     {
         [BsonElement]
-        public object _id { get; set; }
+        public string _id { get; set; }
 
         [BsonElement]
         public string Category { set; get; }
