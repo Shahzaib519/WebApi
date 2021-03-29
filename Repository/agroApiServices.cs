@@ -194,9 +194,60 @@ namespace ograzeeApi.Repository
         }
 
 
+        public dynamic GetSales(string email)
+        {
+            if (Repository.MongoHelper.ConnectToSaleMongoService())
+            {
+                var filter = Builders <SaleData>.Filter.Empty;
+                //var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", password));
+                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
+                List<SaleData> result = MongoHelper.GetSaleCollection(email).Find(filter).ToList();
+                if (result.Count >= 1)
+                {
+                    return result;
+                }
+                else if(result.Count == 0)
+                {
+                    return new List<dynamic>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
 
-        
-        
+        public dynamic GetTransactions(string email)
+        {
+            if (Repository.MongoHelper.ConnectToTHistoryMongoService())
+            {
+                var filter = Builders<TransactionHistory>.Filter.Empty;
+                //var filter = builder.And(builder.Eq("Email", email), builder.Eq("Password", password));
+                //var projection = Builders<UserDataField>.Projection.Include("Name").Include("Sale").Include("Withdrawalable").Exclude("_id");
+                List<TransactionHistory> result = MongoHelper.GetTHistoryCollection(email).Find(filter).ToList();
+                if (result.Count >= 1)
+                {
+                    return result;
+                }
+                else if (result.Count == 0)
+                {
+                    return new List<dynamic>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         /////////////////////////////////////////////////
         /////////////////////////////////////////////////
         /////////////////< Profile >/////////////////////
@@ -441,7 +492,6 @@ namespace ograzeeApi.Repository
                 return null;
             }
         }
-
 
 
 

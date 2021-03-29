@@ -14,12 +14,14 @@ namespace ograzeeApi.Repository
         public static IMongoClient Dataclient { get; set; }
         public static IMongoClient Saleclient { get; set; }
         public static IMongoClient Sysclient { get; set; }
+        public static IMongoClient THistoryclient { get; set; }
 
         // different database
         public static IMongoDatabase Userdatabase { get; set; }
         public static IMongoDatabase Datadatabase { get; set; }
         public static IMongoDatabase Saledatabase { get; set; }
         public static IMongoDatabase Sysdatabase { get; set; }
+        public static IMongoDatabase THistorydatabase { get; set; }
 
 
         public static string mongoConnection = "mongodb+srv://agro123:agro123@cluster0.iwszy.mongodb.net/";
@@ -92,6 +94,23 @@ namespace ograzeeApi.Repository
             }
         }
 
+        internal static bool ConnectToTHistoryMongoService(string mongoDb = "TransactionsHistory") // SUsers, SData  
+        {
+            try
+            {
+                if (THistoryclient == null)
+                {
+                    THistoryclient = new MongoClient(mongoConnection);
+                    THistorydatabase = THistoryclient.GetDatabase(mongoDb);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public static IMongoCollection<registration> clients_collection()
         {
             return Userdatabase.GetCollection<registration>("Clients");
@@ -110,6 +129,11 @@ namespace ograzeeApi.Repository
         public static IMongoCollection<SysData> GetSysCollection() //email
         {
             return Sysdatabase.GetCollection<SysData>("Data");
+        }
+
+        public static IMongoCollection<TransactionHistory> GetTHistoryCollection(string collection) //email
+        {
+            return THistorydatabase.GetCollection<TransactionHistory>(collection);
         }
 
     }

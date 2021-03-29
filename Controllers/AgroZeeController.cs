@@ -103,6 +103,9 @@ namespace ograzeeApi.Controllers
         }
 
 
+        //////////////////////////////////////
+        ///////////// Dashboard //////////////
+        //////////////////////////////////////
 
         [HttpGet]
         [Route("dashboard")]
@@ -121,7 +124,40 @@ namespace ograzeeApi.Controllers
         }
 
 
+        [HttpGet]
+        [Route("getallsales")]
+        public dynamic GetSales(string email)
+        {
+            dynamic res = api.GetSales(email);
 
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+
+        [HttpGet]
+        [Route("getalltransactionhistory")]
+        public dynamic GetTransactions(string email)
+        {
+            dynamic res = api.GetTransactions(email);
+
+            if (res == null)     // unsuccessful
+            {
+                return "Network Connection,-1";
+            }
+            else
+            {
+                return res;
+            }
+        }
+        
+        
         //[HttpGet]
         //[Route("verifyuser")]
         //public dynamic ValidReceiver(string email, string customerID)
@@ -138,10 +174,32 @@ namespace ograzeeApi.Controllers
         //    }
         //}
 
-        //////////////////////////////////////
-        ////////////// Updates ///////////////
-        //////////////////////////////////////
+        [HttpGet]
+        [Route("getsalescount")]
+        public dynamic GetSalesCount() 
+        {
+            return api.GetSalesCount();
+        }
 
+        [HttpGet]
+        [Route("getclientscount")]
+        public dynamic GetClientsCount()
+        {
+            return api.GetClientsCount();
+        }
+
+        [HttpGet]
+        [Route("gettransactionscount")]
+        public dynamic GetTransactionCount()
+        {
+            return api.GetTransactionCount();
+        }
+
+
+
+        //////////////////////////////////////
+        /////////////// Update ///////////////
+        //////////////////////////////////////
 
         [HttpGet]
         [Route("updateam")]
@@ -217,7 +275,7 @@ namespace ograzeeApi.Controllers
 
         //////////////////////////////////////
         /////////////// Transfer /////////////
-        //////////////////////////////////////
+        //////////////////////////////////////        
         
         [HttpGet]
         [Route("transferamount")]
@@ -265,6 +323,9 @@ namespace ograzeeApi.Controllers
         }
 
 
+        //////////////////////////////////////
+        /////////////// Sale  ////////////////
+        //////////////////////////////////////
 
         [HttpGet]
         [Route("newsale")]
@@ -295,7 +356,6 @@ namespace ograzeeApi.Controllers
         }
 
 
-
         [HttpGet]
         [Route("updsale")]
         public dynamic UpdateSale(string email, string id, string image, string cat, double quantity, double demandamount, string address, string date)
@@ -313,7 +373,6 @@ namespace ograzeeApi.Controllers
         }
 
 
-
         [HttpGet]
         [Route("deletesale")]
         public dynamic DeleteSale(string email, string id)
@@ -329,7 +388,6 @@ namespace ograzeeApi.Controllers
                 return res;
             }
         }
-
 
 
     }
